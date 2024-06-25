@@ -7,7 +7,7 @@ import 'codemirror/addon/edit/closebrackets'
 import 'codemirror/lib/codemirror.css'
 
 const Editor = () => {
-  useEffect(() = > {
+  useEffect(() => {
     async function init() {
       Codemirror.fromTextArea(document.getElementById('realTimeEditor'), {
         mode: {name: 'javascript', json:true},
