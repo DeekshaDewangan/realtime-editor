@@ -3,8 +3,14 @@ import http from "http";
 import { Server } from "socket.io";
 import process from "process";
 import ACTIONS from "./Actions.js";
-import connectToMongo from "./db.js"
+import connectToMongo from "./db.js";
 import cors from "cors";
+import {
+  createUserSocketMap,
+  getAllConnectedClients,
+  deleteUserSocketMap,
+  getUserBySocketId,
+} from "./services/userSocketMapService.js";
 
 connectToMongo();
 
@@ -13,21 +19,14 @@ const server = http.createServer(app);
 const io = new Server(server);
 const PORT = process.env.PORT || 5000;
 app.use(cors());
-const userSocketMap = {};
-
-const getAllConnectedClients = (roomId) =>
-  Array.from(io.sockets.adapter.rooms.get(roomId) || []).map((socketId) => ({
-    socketId,
-    userName: userSocketMap[socketId],
-  }));
 
 io.on("connection", (socket) => {
   console.log("socket connected", socket.id);
 
-  socket.on(ACTIONS.JOIN, ({ roomId, userName }) => {
-    userSocketMap[socket.id] = userName;
+  socket.on(ACTIONS.JOIN, async ({ roomId, userName }) => {
+    await createUserSocketMap(socket.id, userName, roomId);
     socket.join(roomId);
-    const clients = getAllConnectedClients(roomId);
+    const clients = await getAllConnectedClients(roomId);
 
     clients.forEach(({ socketId }) => {
       io.to(socketId).emit(ACTIONS.JOINED, {
@@ -46,16 +45,19 @@ io.on("connection", (socket) => {
     io.to(socketId).emit(ACTIONS.CODE_CHANGE, { code });
   });
 
-  socket.on("disconnecting", () => {
+  socket.on("disconnecting", async () => {
     const rooms = [...socket.rooms];
-    rooms.forEach((roomId) => {
-      socket.in(roomId).emit(ACTIONS.DISCONNECTED, {
-        socketId: socket.id,
-        userName: userSocketMap[socket.id],
+    const user = await getUserBySocketId(socket.id);
+    if (user) {
+      rooms.forEach((roomId) => {
+        socket.in(roomId).emit(ACTIONS.DISCONNECTED, {
+          socketId: socket.id,
+          userName: user.userName,
+        });
       });
-    });
-    delete userSocketMap[socket.id];
-    socket.leave();
+      await deleteUserSocketMap(socket.id);
+      socket.leave();
+    }
   });
 });
 
