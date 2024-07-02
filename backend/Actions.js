@@ -1,4 +1,4 @@
-const Actions = {
+const ACTIONS = {
     JOIN: "join",
     JOINED: "joined",
     DISCONNECTED: "disconnected",
@@ -7,4 +7,4 @@ const Actions = {
     LEAVE: "leave",
 };
 
-export default Actions;
+export default ACTIONS;

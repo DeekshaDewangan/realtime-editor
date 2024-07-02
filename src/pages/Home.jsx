@@ -7,7 +7,7 @@ const Home = () => {
   const navigate = useNavigate();
 
   const [roomId, setRoomId] = useState("");
-  const [userName, setUserName] = useState();
+  const [userName, setUserName] = useState("");
 
   const createNewRoom = (e) => {
     e.preventDefault();
