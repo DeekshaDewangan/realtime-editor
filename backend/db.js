@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 mongoose.set('strictQuery', true);
 
-const mongoURI = "mongodb://localhost:27017/codeSync";
+const mongoURI = "mongodb+srv://GoFood:<password>@cluster0.3l8myyc.mongodb.net/codeSync";
 
 const connectToMongo = async () => {
     try {
