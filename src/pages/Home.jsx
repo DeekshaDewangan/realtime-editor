@@ -48,7 +48,7 @@ const Home = () => {
         <div className="formWrapper">
           <img
             className="homePageLogo"
-            src="/code-sync.png"
+            src="/logo.png"
             alt="code-sync-logo"
           />
           <h4 className="mainLabel">Paste Invitation ROOM ID</h4>
