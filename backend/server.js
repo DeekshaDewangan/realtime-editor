@@ -11,6 +11,7 @@ import {
   deleteUserSocketMap,
   getUserBySocketId,
 } from "./services/userSocketMapService.js";
+import path from "path";
 
 connectToMongo();
 
@@ -19,6 +20,10 @@ const server = http.createServer(app);
 const io = new Server(server);
 const PORT = process.env.PORT || 5000;
 app.use(cors());
+app.use(express.static("../dist"));
+app.use((req, res, next) => {
+  res.sendFile(path.join(__dirname, "dist", "index.html"));
+});
 
 io.on("connection", (socket) => {
   console.log("socket connected", socket.id);
